@@ -1,0 +1,49 @@
+name: release
+
+# Builds the standalone `covhl` language-server binaries for every platform and
+# attaches them (gzipped) to a GitHub Release. The Zed extension downloads the
+# asset matching the user's platform, so end users install nothing by hand.
+#
+# Trigger by pushing a tag:  git tag v0.1.0 && git push origin v0.1.0
+# bun --compile cross-compiles every target from a single runner.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Compile all platform binaries
+        run: bun run scripts/compile.ts all
+
+      - name: Gzip release assets
+        working-directory: server/dist
+        run: |
+          for f in covhl-*; do
+            [ -e "$f" ] || continue
+            gzip -c "$f" > "$f.gz"
+          done
+          ls -lh
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: server/dist/*.gz

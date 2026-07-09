@@ -1,0 +1,19 @@
+# Rust / Zed extension build output
+target/
+**/*.wasm
+grammars/
+*.rs.bk
+
+# TypeScript language server
+server/node_modules/
+server/dist/
+
+# Compiled server binaries (published via GitHub Releases, never committed)
+covhl
+covhl-*
+
+# OS / editor
+.DS_Store
+
+# Loop working file (dev-only, not shipped)
+goal.txt

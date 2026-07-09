@@ -1,0 +1,20 @@
+Test Coverage Highlight
+=======================
+
+Copyright (c) 2026 Hyyan Abo Fakher
+Licensed under the MIT License (see LICENSE).
+
+This project contains no code copied from the "vscode-coverage-gutters"
+extension. It independently depends on the same publicly published, standalone
+coverage-report parser packages, plus a color parser, via the language server:
+
+  lcov-parse                 BSD-3-Clause   https://www.npmjs.com/package/lcov-parse
+  @7sean68/jacoco-parse      MIT            https://www.npmjs.com/package/@7sean68/jacoco-parse
+  cobertura-parse            MIT            https://www.npmjs.com/package/cobertura-parse
+  @cvrg-report/clover-json   MIT            https://www.npmjs.com/package/@cvrg-report/clover-json
+  color                      MIT            https://www.npmjs.com/package/color
+  vscode-languageserver      MIT            https://www.npmjs.com/package/vscode-languageserver
+
+Each package is used under its own license, which permits use and redistribution
+provided its copyright and permission notices are retained. Their full license
+texts are distributed inside the compiled language-server binary's dependencies.

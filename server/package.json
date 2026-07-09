@@ -1,0 +1,32 @@
+{
+  "name": "covhl-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Language server that reports test coverage (lcov, jacoco, cobertura, clover) as LSP document colors.",
+  "author": "Hyyan Abo Fakher <hyyanaf@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "covhl": "dist/server.js"
+  },
+  "scripts": {
+    "build": "bun build src/server.ts --target=node --outdir dist",
+    "compile": "bun run scripts/compile.ts",
+    "test": "bun test",
+    "coverage": "bun test --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@7sean68/jacoco-parse": "^2.2.0",
+    "@cvrg-report/clover-json": "^0.3.3",
+    "cobertura-parse": "^1.0.5",
+    "color": "^4.2.3",
+    "lcov-parse": "^1.0.0",
+    "vscode-languageserver": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/color": "^3.0.6",
+    "typescript": "^5.6.3"
+  }
+}
