@@ -5,6 +5,8 @@ editor: uncovered lines red, partially covered lines yellow, and covered lines
 green (opt-in, off by default). The file's coverage percentage is shown as a
 code lens and on hover.
 
+![Coverage highlighting in Zed: covered lines green, partial lines yellow, uncovered lines red, with a coverage code lens and toggle action](assets/screenshot.png)
+
 It reads **lcov, jacoco, cobertura and clover** reports, auto-discovers them
 across multi-module projects, and merges them. Java (jacoco), Kotlin, Scala,
 Groovy, Rust, JS/TS, Python, Go, C/C++, C#, Ruby, PHP and Dart are wired up.
