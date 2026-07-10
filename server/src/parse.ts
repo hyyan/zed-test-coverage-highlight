@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * Format detection and parsing, delegating to the vscode-coverage-gutters
  * parser packages. Each parser yields the same "coverage section" shape:

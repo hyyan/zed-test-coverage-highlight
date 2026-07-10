@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * Shared coverage model and source-path matching.
  *

@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 // Type declarations for the untyped vscode-coverage-gutters parser packages.
 // Each yields the same "coverage section" shape; we validate it in parsers/.
 

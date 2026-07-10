@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /** `file://` URI to filesystem path conversion. */
 
 import { fileURLToPath } from "node:url";

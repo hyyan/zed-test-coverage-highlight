@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * Report discovery, matching vscode-coverage-gutters' defaults: find every
  * report by file name at any depth. `target`/`build` are NOT skipped, since

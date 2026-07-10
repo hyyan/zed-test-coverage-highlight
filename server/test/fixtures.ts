@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 // Minimal, self-contained report fixtures — one per supported format. Each
 // exercises covered (line 1), uncovered (line 2) and, where the format carries
 // branch data, partial (line 3).
