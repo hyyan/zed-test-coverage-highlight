@@ -3,13 +3,9 @@ name = "Test Coverage Highlight"
 version = "0.1.0"
 schema_version = 1
 authors = ["Hyyan Abo Fakher <hyyanaf@gmail.com>"]
-description = "Highlight test coverage (lcov, jacoco, cobertura, clover) as colored lines, via LSP document colors."
-repository = "https://github.com/hyyanaf/test-coverage-highlight"
+description = "Highlight test coverage (lcov, jacoco, cobertura, clover) as colored lines."
+repository = "https://github.com/hyyan/zed-test-coverage-highlight"
 
-# Ships only a language server. It attaches alongside each language's real LSP
-# (rust-analyzer, jdtls, ...) and answers textDocument/documentColor with a color
-# per covered / uncovered / partial line, plus a coverage-% hover. Zed renders
-# the colors according to the `lsp_document_colors` setting ("background").
 [language_servers.covhl]
 name = "Test Coverage Highlight"
 languages = [

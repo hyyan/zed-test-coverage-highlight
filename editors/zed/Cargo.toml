@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Hyyan Abo Fakher <hyyanaf@gmail.com>"]
 description = "Zed extension that highlights test coverage as LSP document colors."
 license = "MIT"
-repository = "https://github.com/hyyanaf/test-coverage-highlight"
+repository = "https://github.com/hyyan/zed-test-coverage-highlight"
 
 [lib]
 crate-type = ["cdylib"]

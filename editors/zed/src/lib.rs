@@ -15,10 +15,7 @@ use zed::settings::LspSettings;
 use zed_extension_api::{self as zed, LanguageServerId, Result};
 
 /// GitHub repo publishing the `covhl` release binaries.
-///
-/// NOTE: set this to the real repository before cutting a release, or the
-/// download step cannot find the platform asset.
-const REPO: &str = "hyyanaf/test-coverage-highlight";
+const REPO: &str = "hyyan/zed-test-coverage-highlight";
 const SERVER_NAME: &str = "covhl";
 
 struct TestCoverageHighlight {
