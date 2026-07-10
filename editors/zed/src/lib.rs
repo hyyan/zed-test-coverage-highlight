@@ -70,6 +70,8 @@ impl TestCoverageHighlight {
                 language_server_id,
                 &zed::LanguageServerInstallationStatus::Downloading,
             );
+            fs::create_dir_all(&version_dir)
+                .map_err(|err| format!("failed to create directory `{version_dir}`: {err}"))?;
             zed::download_file(
                 &asset.download_url,
                 &binary_path,
