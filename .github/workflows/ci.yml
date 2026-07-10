@@ -20,7 +20,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun test
-      - run: bun run compile # smoke-test the host binary build
+      - run: bun run compile
 
   extension:
     name: zed extension (wasm)
