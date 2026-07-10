@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * User settings, read from the LSP initialization options and from live
  * `workspace/didChangeConfiguration` updates. In Zed these live under
@@ -8,7 +5,9 @@
  *
  * Colours accept any CSS format (named, hex, rgb/rgba, hsl, hwb, ...) via the
  * `color` package. A colour that carries its own alpha overrides the global
- * `alpha`; otherwise the global `alpha` is applied.
+ * `alpha`; otherwise the global `alpha` is applied. `null` means "do not
+ * highlight lines in this state" — the default for covered lines, so only
+ * uncovered/partial lines are painted unless the user opts in.
  */
 
 import Color from "color";
@@ -33,30 +32,34 @@ interface StoredColor {
 const DEFAULTS = {
   enabled: true,
   showHover: true,
+  showCodeLens: true,
   autoRefresh: true,
   alpha: 0.2,
-  covered: { red: 0.18, green: 0.8, blue: 0.44 } as StoredColor,
-  uncovered: { red: 0.9, green: 0.3, blue: 0.3 } as StoredColor,
-  partial: { red: 0.95, green: 0.77, blue: 0.2 } as StoredColor,
+  covered: null as StoredColor | null,
+  uncovered: { red: 0.9, green: 0.3, blue: 0.3 } as StoredColor | null,
+  partial: { red: 0.95, green: 0.77, blue: 0.2 } as StoredColor | null,
 };
 
 export class Config {
   enabled = DEFAULTS.enabled;
   showHover = DEFAULTS.showHover;
+  showCodeLens = DEFAULTS.showCodeLens;
   autoRefresh = DEFAULTS.autoRefresh;
   alpha = DEFAULTS.alpha;
   coveragePath: string | undefined;
-  private covered: StoredColor = DEFAULTS.covered;
-  private uncovered: StoredColor = DEFAULTS.uncovered;
-  private partial: StoredColor = DEFAULTS.partial;
+  private covered = DEFAULTS.covered;
+  private uncovered = DEFAULTS.uncovered;
+  private partial = DEFAULTS.partial;
 
-  colorFor(state: LineState): CoverageColor {
+  /** The colour for a line state, or undefined when that state is not highlighted. */
+  colorFor(state: LineState): CoverageColor | undefined {
     const c =
       state === LineState.Covered
         ? this.covered
         : state === LineState.Partial
           ? this.partial
           : this.uncovered;
+    if (!c) return undefined;
     return { red: c.red, green: c.green, blue: c.blue, alpha: c.alpha ?? this.alpha };
   }
 
@@ -67,6 +70,7 @@ export class Config {
 
     if (typeof o["enabled"] === "boolean") this.enabled = o["enabled"];
     if (typeof o["showHover"] === "boolean") this.showHover = o["showHover"];
+    if (typeof o["showCodeLens"] === "boolean") this.showCodeLens = o["showCodeLens"];
     if (typeof o["autoRefresh"] === "boolean") this.autoRefresh = o["autoRefresh"];
     if (typeof o["coveragePath"] === "string") this.coveragePath = o["coveragePath"];
     if (typeof o["alpha"] === "number") this.alpha = clamp(o["alpha"], 0, 1);
@@ -74,11 +78,17 @@ export class Config {
     const colors = o["colors"];
     if (colors && typeof colors === "object") {
       const c = colors as Record<string, unknown>;
-      this.covered = parseColor(c["covered"]) ?? this.covered;
-      this.uncovered = parseColor(c["uncovered"]) ?? this.uncovered;
-      this.partial = parseColor(c["partial"]) ?? this.partial;
+      this.covered = applyColor(c["covered"], this.covered);
+      this.uncovered = applyColor(c["uncovered"], this.uncovered);
+      this.partial = applyColor(c["partial"], this.partial);
     }
   }
+}
+
+/** `null` disables the highlight, a valid CSS string sets it, anything else keeps `current`. */
+function applyColor(value: unknown, current: StoredColor | null): StoredColor | null {
+  if (value === null) return null;
+  return parseColor(value) ?? current;
 }
 
 function clamp(n: number, lo: number, hi: number): number {

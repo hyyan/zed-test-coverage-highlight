@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * Pure rendering of a file's coverage into LSP document colors and hover text.
  * Kept free of any LSP connection state so it can be unit-tested directly.
@@ -28,13 +25,15 @@ export function documentColors(states: LineMap, config: Config): ColorInformatio
   const colors: ColorInformation[] = [];
   for (const [line, state] of states) {
     if (line < 1) continue;
+    const color = config.colorFor(state);
+    if (!color) continue; // this state's colour is null -> not highlighted
     const idx = line - 1;
     colors.push({
       range: {
         start: { line: idx, character: 0 },
         end: { line: idx + 1, character: 0 },
       },
-      color: config.colorFor(state),
+      color,
     });
   }
   return colors;
@@ -57,6 +56,35 @@ export function summarize(states: LineMap): Summary {
   return { hit, total, percent };
 }
 
+export interface CodeLens {
+  range: {
+    start: { line: number; character: number };
+    end: { line: number; character: number };
+  };
+  command: { title: string; command: string };
+}
+
+/** One summary code lens above the first line; clicking it runs `toggleCommand`. */
+export function codeLens(
+  states: LineMap,
+  config: Config,
+  toggleCommand: string,
+): CodeLens | undefined {
+  if (!config.showCodeLens) return undefined;
+  const { hit, total, percent } = summarize(states);
+  if (total === 0) return undefined;
+  return {
+    range: {
+      start: { line: 0, character: 0 },
+      end: { line: 0, character: 0 },
+    },
+    command: {
+      title: `Coverage: ${percent.toFixed(0)}% (${hit}/${total} lines covered)`,
+      command: toggleCommand,
+    },
+  };
+}
+
 /** Markdown hover for a 0-based line, or undefined when there is nothing to show. */
 export function hover(
   states: LineMap,
@@ -76,5 +104,5 @@ export function hover(
           ? "\n\n◐ This line is partially covered"
           : "";
 
-  return `**Coverage: ${percent.toFixed(0)}%** (${hit}/${total} lines)${note}`;
+  return `**File coverage: ${percent.toFixed(0)}%** (${hit}/${total} lines covered)${note}`;
 }

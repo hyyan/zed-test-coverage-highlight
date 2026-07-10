@@ -1,8 +1,9 @@
 # Test Coverage Highlight
 
 A [Zed](https://zed.dev) extension that highlights test coverage directly in the
-editor — covered lines green, uncovered red, partially-covered yellow — with a
-coverage-percentage hover.
+editor — uncovered lines red, partially-covered yellow, covered lines green
+(opt-in; unpainted by default to stay unobtrusive) — with the file's
+coverage percentage as a code lens and hover.
 
 It reads **lcov, jacoco, cobertura and clover** reports, auto-discovers them
 across multi-module projects, and merges them. Java (jacoco), Kotlin, Scala,
@@ -26,13 +27,26 @@ coverage reports.
 ```
 
 Options: `"background"` (recommended), `"border"`, `"inlay"`, or `"none"`.
-Note this is a global Zed setting and also affects CSS color previews.
+
+## Coverage summary (code lens)
+
+The file's coverage — `Coverage: 49% (70/142 lines covered)` — is shown as a
+code lens above the first line; clicking it toggles highlighting. Zed keeps
+code lenses **off by default**, so enable them in `settings.json`:
+
+```json
+{
+  "code_lens": "on"
+}
+```
+
+or run **editor: toggle code lens**. The same summary is also shown when
+hovering any line, no setting needed.
 
 ## Coverage reports
 
 Reports are discovered by file name at any depth, skipping `node_modules`,
-`venv`, `.venv`, `vendor` and `.git` (but **not** `target`/`build`, where jacoco
-lives). Recognized names:
+`venv`, `.venv`, `vendor` and `.git`. Recognized names:
 
 `lcov.info`, `jacoco.xml`, `cobertura.xml`, `coverage.xml`, `cov.xml`,
 `coverage.cobertura.xml`, `clover.xml`.
@@ -50,6 +64,7 @@ Configure under `lsp.covhl.settings` in Zed `settings.json`:
       "settings": {
         "enabled": true,
         "showHover": true,
+        "showCodeLens": true,
         "autoRefresh": true,
         "alpha": 0.2,
         "coveragePath": "target/site/jacoco/jacoco.xml",
@@ -64,28 +79,32 @@ Configure under `lsp.covhl.settings` in Zed `settings.json`:
 }
 ```
 
-- **enabled** — master switch.
+- **enabled** — highlighting switch (the hover stays on; it has its own switch).
 - **showHover** — show the coverage-% hover.
+- **showCodeLens** — show the coverage-% code lens (also needs Zed's
+  `"code_lens": "on"`).
 - **autoRefresh** — nudge open editors to re-color when a report changes.
 - **alpha** — fill opacity (0–1) for colors that don't carry their own alpha.
 - **coveragePath** — pin a single report instead of auto-discovering.
-- **colors** — any CSS color format (named, hex, `rgb()`, `rgba()`, `hsl()`, …).
+- **colors** — any CSS color format (named, hex, `rgb()`, `rgba()`, `hsl()`, …),
+  or `null` to not highlight that state. **By default `covered` is `null`**:
+  only uncovered (red) and partial (yellow) lines are painted, which keeps the
+  editor calm. Set `"covered": "#2ecc71"` to paint covered lines too.
 
 Changes apply live, without restarting the server.
+
+## Toggling highlighting
+
+Open the code-action menu on any line (`cmd-.` / `editor: toggle code actions`)
+and pick **Coverage: disable highlighting** (or enable). The hover keeps
+working while highlighting is off. The `enabled` setting does the same thing
+persistently.
 
 ## Installing the server binary
 
 The extension downloads the prebuilt `covhl` binary for your platform from this
 repo's GitHub Releases. To use a local build instead, put a `covhl` binary on
 your `$PATH` — the extension prefers it.
-
-## Limitations
-
-- No true gutter markers, footer button, status-bar percentage, or settings UI
-  panel: none of those surfaces are available to Zed extensions. The hover is
-  the percentage surface; whole-line background is the marker.
-- `lsp_document_colors` is global and shared with CSS color previews.
-
 ## Development
 
 ```

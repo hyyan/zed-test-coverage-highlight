@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 Hyyan Abo Fakher
-
 /**
  * Test-coverage language server.
  *
@@ -22,6 +19,9 @@ import {
   StreamMessageReader,
   StreamMessageWriter,
   TextDocumentSyncKind,
+  type CodeAction,
+  type CodeLens,
+  type CodeLensParams,
   type ColorInformation,
   type DidChangeConfigurationParams,
   type DocumentColorParams,
@@ -33,12 +33,13 @@ import {
 } from "vscode-languageserver/node.js";
 
 import { Config } from "./config.js";
-import { documentColors, hover as renderHover } from "./render.js";
+import { codeLens as renderCodeLens, documentColors, hover as renderHover } from "./render.js";
 import { CoverageStore } from "./store.js";
 import { uriToPath } from "./uri.js";
 
 const LSP_NAME = "covhl";
 const POLL_MS = 2500;
+const TOGGLE_COMMAND = "covhl.toggleHighlight";
 
 // Force a stdio transport so the binary works without a `--stdio` argument.
 const connection = createConnection(
@@ -50,15 +51,21 @@ const config = new Config();
 const openDocs = new Set<string>();
 let store: CoverageStore | undefined;
 let pollTimer: ReturnType<typeof setInterval> | undefined;
+let clientCanRefreshCodeLenses = false;
 
 connection.onInitialize((params: InitializeParams): InitializeResult => {
   config.apply(extractSettings(params.initializationOptions));
   store = new CoverageStore(rootPath(params), config.coveragePath);
+  clientCanRefreshCodeLenses =
+    params.capabilities.workspace?.codeLens?.refreshSupport ?? false;
   return {
     capabilities: {
       textDocumentSync: { openClose: true, change: TextDocumentSyncKind.None },
       colorProvider: true,
       hoverProvider: true,
+      codeLensProvider: { resolveProvider: false },
+      codeActionProvider: true,
+      executeCommandProvider: { commands: [TOGGLE_COMMAND] },
     },
     serverInfo: { name: LSP_NAME, version: "0.1.0" },
   };
@@ -99,6 +106,35 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
   return value ? { contents: { kind: MarkupKind.Markdown, value } } : null;
 });
 
+// File coverage summary as a code lens; Zed renders lenses only when the
+// user sets `"code_lens": "on"`.
+connection.onCodeLens(async (params: CodeLensParams): Promise<CodeLens[]> => {
+  if (!store || !config.showCodeLens) return [];
+  await store.whenReady();
+  await store.reloadIfChanged();
+  const states = statesFor(params.textDocument.uri);
+  const lens = states ? renderCodeLens(states, config, TOGGLE_COMMAND) : undefined;
+  return lens ? [lens] : [];
+});
+
+// Zed cannot bind editor commands to an extension, so the on/off switch is
+// exposed as a code action ("cmd-." on any line).
+connection.onCodeAction((): CodeAction[] => [
+  {
+    title: config.enabled
+      ? "Coverage: disable highlighting"
+      : "Coverage: enable highlighting",
+    kind: "source",
+    command: { title: "Toggle coverage highlighting", command: TOGGLE_COMMAND },
+  },
+]);
+
+connection.onExecuteCommand(async (params) => {
+  if (params.command !== TOGGLE_COMMAND) return;
+  config.enabled = !config.enabled;
+  await nudgeAll(true);
+});
+
 connection.onDidChangeConfiguration(async (params: DidChangeConfigurationParams) => {
   const previousPath = config.coveragePath;
   config.apply(extractSettings(params.settings));
@@ -120,8 +156,15 @@ async function poll(): Promise<void> {
 }
 
 /** Nudge every open document so the editor re-pulls its coverage colors. */
-async function nudgeAll(): Promise<void> {
-  if (!config.autoRefresh) return;
+async function nudgeAll(force = false): Promise<void> {
+  if (!config.autoRefresh && !force) return;
+  if (clientCanRefreshCodeLenses) {
+    try {
+      await connection.sendRequest("workspace/codeLens/refresh");
+    } catch {
+      // Lenses still refresh on the next document change.
+    }
+  }
   for (const uri of openDocs) {
     await nudge(uri);
   }
