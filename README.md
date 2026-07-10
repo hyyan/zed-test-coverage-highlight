@@ -1,9 +1,9 @@
 # Test Coverage Highlight
 
 A [Zed](https://zed.dev) extension that highlights test coverage directly in the
-editor — uncovered lines red, partially-covered yellow, covered lines green
-(opt-in; unpainted by default to stay unobtrusive) — with the file's
-coverage percentage as a code lens and hover.
+editor: uncovered lines red, partially covered lines yellow, and covered lines
+green (opt-in, off by default). The file's coverage percentage is shown as a
+code lens and on hover.
 
 It reads **lcov, jacoco, cobertura and clover** reports, auto-discovers them
 across multi-module projects, and merges them. Java (jacoco), Kotlin, Scala,
@@ -30,8 +30,9 @@ Options: `"background"` (recommended), `"border"`, `"inlay"`, or `"none"`.
 
 ## Coverage summary (code lens)
 
-The file's coverage — `Coverage: 49% (70/142 lines covered)` — is shown as a
-code lens above the first line; clicking it toggles highlighting. Zed keeps
+The file's coverage, for example `Coverage: 49% (70/142 lines covered)`, is
+shown as a code lens above the first line. Clicking it toggles highlighting.
+Zed keeps
 code lenses **off by default**, so enable them in `settings.json`:
 
 ```json
@@ -51,7 +52,7 @@ Reports are discovered by file name at any depth, skipping `node_modules`,
 `lcov.info`, `jacoco.xml`, `cobertura.xml`, `coverage.xml`, `cov.xml`,
 `coverage.cobertura.xml`, `clover.xml`.
 
-Re-run your tests and the colors refresh automatically — no reload.
+Re-run your tests and the colors refresh automatically, no reload needed.
 
 ## Settings
 
@@ -79,17 +80,19 @@ Configure under `lsp.covhl.settings` in Zed `settings.json`:
 }
 ```
 
-- **enabled** — highlighting switch (the hover stays on; it has its own switch).
-- **showHover** — show the coverage-% hover.
-- **showCodeLens** — show the coverage-% code lens (also needs Zed's
-  `"code_lens": "on"`).
-- **autoRefresh** — nudge open editors to re-color when a report changes.
-- **alpha** — fill opacity (0–1) for colors that don't carry their own alpha.
-- **coveragePath** — pin a single report instead of auto-discovering.
-- **colors** — any CSS color format (named, hex, `rgb()`, `rgba()`, `hsl()`, …),
-  or `null` to not highlight that state. **By default `covered` is `null`**:
-  only uncovered (red) and partial (yellow) lines are painted, which keeps the
-  editor calm. Set `"covered": "#2ecc71"` to paint covered lines too.
+| Setting        | Default        | Description                                                                     |
+| -------------- | -------------- | ------------------------------------------------------------------------------- |
+| `enabled`      | `true`         | Highlighting switch. The hover has its own switch and stays on.                 |
+| `showHover`    | `true`         | Show the coverage percentage on hover.                                          |
+| `showCodeLens` | `true`         | Show the coverage code lens. Also needs Zed's `"code_lens": "on"`.              |
+| `autoRefresh`  | `true`         | Re-color open editors when a report changes.                                    |
+| `alpha`        | `0.2`          | Fill opacity (0 to 1) for colors that don't carry their own alpha.              |
+| `coveragePath` | unset          | Pin a single report instead of auto-discovering.                                |
+| `colors`       | see below      | Per-state colors in any CSS format (named, hex, `rgb()`, `rgba()`, `hsl()`), or `null` to not highlight that state. |
+
+By default `colors.covered` is `null`: only uncovered (red) and partial
+(yellow) lines are painted. Set `"covered": "#2ecc71"` to paint covered lines
+too.
 
 Changes apply live, without restarting the server.
 
@@ -104,7 +107,8 @@ persistently.
 
 The extension downloads the prebuilt `covhl` binary for your platform from this
 repo's GitHub Releases. To use a local build instead, put a `covhl` binary on
-your `$PATH` — the extension prefers it.
+your `$PATH`. A binary on the `$PATH` takes priority over the downloaded one.
+
 ## Development
 
 ```
@@ -121,4 +125,4 @@ bun run compile       # build the covhl binary for this platform -> dist/
 
 ## License
 
-MIT © 2026 Hyyan Abo Fakher. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+MIT © 2026 Hyyan Abo Fakher. See [LICENSE](LICENSE).
