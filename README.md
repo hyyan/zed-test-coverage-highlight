@@ -1,5 +1,7 @@
 # Test Coverage Highlight
 
+![Zed extension badge](https://zedbadge.dev/extension/test-coverage-highlight-lsp.svg?style=flat&metric=version&raw=1)
+
 A [Zed](https://zed.dev) extension that highlights test coverage directly in the
 editor: uncovered lines red, partially covered lines yellow, and covered lines
 green (opt-in, off by default). The file's coverage percentage is shown as a
