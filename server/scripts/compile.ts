@@ -19,13 +19,26 @@ const TARGETS: Record<string, string> = {
   "x86_64-unknown-linux-gnu": "bun-linux-x64",
   "aarch64-unknown-linux-gnu": "bun-linux-arm64",
   "x86_64-pc-windows-msvc": "bun-windows-x64",
+  "x86_64-alpine-linux-musl": "bun-linux-musl-x64",
+  "aarch64-alpine-linux-musl": "bun-linux-musl-arm64",
 };
+
+interface ReportHeader {
+  glibcVersionRuntime?: string;
+  osVersion?: string;
+}
 
 function hostTriple(): string {
   const arch = process.arch === "arm64" ? "aarch64" : "x86_64";
   if (process.platform === "darwin") return `${arch}-apple-darwin`;
   if (process.platform === "win32") return "x86_64-pc-windows-msvc";
-  return `${arch}-unknown-linux-gnu`;
+
+  const report = process.report?.getReport() as { header?: ReportHeader } | undefined;
+  const header = report?.header;
+  const isAlpineMusl =
+    !header?.glibcVersionRuntime && (header?.osVersion?.includes("Alpine") ?? false);
+
+  return isAlpineMusl ? `${arch}-alpine-linux-musl` : `${arch}-unknown-linux-gnu`;
 }
 
 async function build(triple: string): Promise<void> {
