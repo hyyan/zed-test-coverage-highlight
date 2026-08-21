@@ -11,6 +11,25 @@ It reads **lcov, jacoco, cobertura and clover** reports, auto-discovers them
 across multi-module projects, and merges them. Java (jacoco), Kotlin, Scala,
 Groovy, Rust, JS/TS, Python, Go, C/C++, C#, Ruby, PHP and Dart are wired up.
 
+## Installation
+
+1. In Zed, open the extensions view (`zed: extensions`, or `cmd-shift-x` on
+   macOS and `ctrl-shift-x` on Linux and Windows), search for
+   **Test Coverage Highlight** and click **Install**.
+2. Enable the rendering in your Zed `settings.json`:
+
+   ```json
+   {
+     "lsp_document_colors": "background"
+   }
+   ```
+
+   Options: `"background"` (recommended), `"border"`, `"inlay"`, or `"none"`.
+
+3. Open a project that contains a coverage report. The extension downloads the
+   `covhl` language server for your platform on first use, no manual setup
+   needed.
+
 ## How it works
 
 Zed extensions are sandboxed WASM and cannot draw gutters or decorations. The
@@ -20,22 +39,11 @@ extension ships a small language server (`covhl`) that attaches alongside your
 real language server and answers `documentColor` (and `hover`) from your
 coverage reports.
 
-**Enable the rendering** in your Zed `settings.json`:
-
-```json
-{
-  "lsp_document_colors": "background"
-}
-```
-
-Options: `"background"` (recommended), `"border"`, `"inlay"`, or `"none"`.
-
 ## Coverage summary (code lens)
 
 The file's coverage, for example `Coverage: 49% (70/142 lines covered)`, is
 shown as a code lens above the first line. Clicking it toggles highlighting.
-Zed keeps
-code lenses **off by default**, so enable them in `settings.json`:
+Zed keeps code lenses **off by default**, so enable them in `settings.json`:
 
 ```json
 {
@@ -105,7 +113,7 @@ and pick **Coverage: disable highlighting** (or enable). The hover keeps
 working while highlighting is off. The `enabled` setting does the same thing
 persistently.
 
-## Installing the server binary
+## Server binary
 
 The extension downloads the prebuilt `covhl` binary for your platform from this
 repo's GitHub Releases. To use a local build instead, put a `covhl` binary on
