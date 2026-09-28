@@ -48,6 +48,10 @@ async function build(triple: string): Promise<void> {
   const outfile = `dist/covhl-${triple}${ext}`;
   console.log(`building ${outfile}  (${target})`);
   await $`bun build src/server.ts --compile --target=${target} --minify --outfile ${outfile}`;
+  if (process.platform === "darwin" && triple.includes("apple-darwin")) {
+    await $`codesign --force --sign - ${outfile}`;
+    await $`codesign --verify --strict ${outfile}`;
+  }
 }
 
 const arg = process.argv[2];
